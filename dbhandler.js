@@ -344,10 +344,6 @@ function filteredData(obj,callback)
             },
 
             {
-                $or:obj.st
-            },
-
-            {
                 $or:obj.ca
             },
 
@@ -355,7 +351,7 @@ function filteredData(obj,callback)
                 $or:obj.str
             }]
 
-    }
+    };
 
 
     console.log("Getting O");

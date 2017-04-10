@@ -8,9 +8,11 @@ function logged(user) {
         localStorage.setItem('username',user.providerData[0].email);
         localStorage.setItem('state','true');
         console.log(user.providerData[0].email);
-        console.log("Hello");
-        console.log(user.providerData);
-        window.location.href='index.html';
+        console.log("Hello. New user");
+        console.log(user.providerData[0].email);
+        //  window.location.href='index.html';
+        //   window.location.reload();
+        RefreshState();
     });
 }
 
@@ -24,9 +26,11 @@ $('#google').click(function () {
     firebase.auth().signInWithPopup(provider).then(function(result) {
         var user = result.user;
         logged(user);
+        RefreshState();
 
     }).catch(function(error) {
         alert(error.message);
+        RefreshState();
     });
 });
 
@@ -67,13 +71,13 @@ $("#twitter").click(function () {
 });
 
 
-
-$(function () {
-    firebase.auth().signOut().then(function() {
-        localStorage.removeItem('username');
-                localStorage.removeItem('state');
-    }, function(error) {
-        console.log(error.code);
-        console.log(error.message);
-    });
-});
+/*
+ $(function () {
+ firebase.auth().signOut().then(function() {
+ localStorage.removeItem('username');
+ localStorage.removeItem('state');
+ }, function(error) {
+ console.log(error.code);
+ console.log(error.message);
+ });
+ });*/

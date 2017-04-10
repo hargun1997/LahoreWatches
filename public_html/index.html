@@ -51,14 +51,18 @@
 			<span class="login">
 
 
-                <div id="LoginDiv"  style="display: none" >Login
+                <div id="LoginDiv"  style="display: none" >
+
             <img src="img/gplus.png" id="google" >
-                    <script src="helper_files/index.js"></script>
+
             </div>
 
 
     <div id="LoggedDiv" style="display:none;">
 
+        <span id="LoginSpan">
+
+                    </span>
 
         <button id="LogOutButton">
 
@@ -155,9 +159,7 @@
     </div>
 
     <button id="sub">apply filters</button>
-
-
-    <button class="close">
+    <button class="close">Close</button>
 </section>
 <section class="main_content" id="results" style="display:none">
 
@@ -177,11 +179,13 @@
     var Brands = $('#Brands');
     var Results = $('#results');
     var sub=$('#sub');
-
+    console.log(sub);
     var T={};
+    var LoginSpan = $('#LoginSpan');
 
-    function main()
+    function RefreshState()
     {
+        username = localStorage.getItem('username');
         if(username == null || username == undefined || typeof username == 'undefined')
         {
             LoggedDiv.css({'display' : 'none'});
@@ -193,232 +197,392 @@
         {
             LoginDiv.css({'display' : 'none'});
             LoggedDiv.css({'display' : 'inline-block'});
-            LoggedDiv.prepend(' Welcome ' + username + ' ');
-
+            LoginSpan.html('Welcome ' + username + '')
+            // LoggedDiv.prepend(' <span id="user">Welcome ' + username + ' </span> ');
         }
 
+    }
+    function main()
+    {
+        var sub=$('#sub');
+        if(username == null || username == undefined || typeof username == 'undefined')
+        {
+            LoggedDiv.css({'display' : 'none'});
+            LoginDiv.css({'display' : 'inline-block'});
+            localStorage.removeItem('username');
+            localStorage.removeItem('state');
+        }
+        else
+        {
+            LoginDiv.css({'display' : 'none'});
+            LoggedDiv.css({'display' : 'inline-block'});
+            //  LoggedDiv.prepend(' <span id="user">Welcome ' + username + ' </span> ');
+            LoginSpan.html('Welcome ' + username + '')
+        }
         cart = localStorage.getItem('cart');
-
         if(cart == null || typeof cart == 'undefined' || cart == undefined)
         {
             cart = [];
             localStorage.setItem('cart', JSON.stringify(cart));
         }
-
         cart = localStorage.getItem('cart');
         cart = JSON.parse(cart);
         CartNum.html(cart.length);
-
         CartDiv.click(function () {
-
             window.location.href = "cart.html";
-
         });
+      /*  localStorage.removeItem('username');
+        localStorage.removeItem('state');
+        firebase.auth().signOut().then(function() {
+            localStorage.removeItem('username');
+            localStorage.removeItem('state');
+            //  location.reload();
 
+
+            RefreshState();
+        }, function(error) {
+            console.log(error.code);
+            console.log(error.message);
+            RefreshState();
+            //location.reload();
+        });*/
         $('#LogOutButton').click(function () {
-
             localStorage.removeItem('username');
             localStorage.removeItem('state');
             firebase.auth().signOut().then(function() {
                 localStorage.removeItem('username');
                 localStorage.removeItem('state');
-                location.reload();
+                //  location.reload();
+
+
+                RefreshState();
             }, function(error) {
                 console.log(error.code);
                 console.log(error.message);
-                location.reload();
+                RefreshState();
+                //location.reload();
             });
+        });
+        var str='';
+        Results.html("Loading..");
+        Results.css({"display" : "block"});
+
+        console.log("Hello");
+        count=1;
+
+        $.post('/all-products', {}, function (data, status) {
+
+            console.log(status);
 
 
+            for(var i = 0 ; i < data.docs.length; ++i)
+            {
+                str +='<div id="' + data.docs[i].UniqueId + '" class="item ProductDetails"> <img src="img/item.jpg"> <span class="wname">'+data.docs[i].collection+'</span>, <div><span class="wbrand"><b>'+data.docs[i].brand+'</b></span> <span class="wmodel">'+data.docs[i].UniqueId+'</span></div> <div><span class="price">&#8377; '+data.docs[i].price+'</span></div> </div>';
+
+            }
+            Results.html(str);
         });
 
 
         sub.click(function(){
 
-            T = T1;
+            console.log("Sub Function called");
 
-            var k;
-            k={};
-            k.docs=[];
-            var l = 0;
+            var obj={};
+            obj.br=[];
+            obj.ge=[];
+            obj.di=[];
+            obj.ca=[];
+           // obj.st=[];
+            obj.str=[];
+          /*  UniqueId : id,
+                type : type,
+                brand : brand,
+                gender : gender,
+                price : price,
+                caseShape : caseShape,
+                strap : strap,
+                collection : collection,
+                display : display*/
             $('input[name="brand"]:checked').each(function() {
                 var temp=this.value;
-                ++l;
-
-                for(i=0;i<T.docs.length;i++)
-                {
-
-                    if(T.docs[i].brand==temp)
-                    {
-                        k.docs.push(T.docs[i]);
-
-
-
-                    }
-                }
-
+                var a={'brand':temp};
+                obj.br.push(a);
 
             });
-
-            if(l != 0)
-                T = k;
-
-
-            k = {};
-            k.docs = [];
-            l = 0;
 
             $('input[name="gender"]:checked').each(function() {
                 var temp=this.value;
-                ++l;
+                var a={'gender':temp};
+                obj.ge.push(a);
 
-                for(i=0;i<T.docs.length;i++)
-                {
-
-                    if(T.docs[i].gender==temp)
-                    {
-                        k.docs.push(T.docs[i]);
-
-
-
-                    }
-                }
             });
-
-            if(l != 0)
-                T = k;
-
-
-            k = {};
-            k.docs = [];
-            l = 0;
 
             $('input[name="display"]:checked').each(function() {
                 var temp=this.value;
-                ++l;
+                var c={'display':temp};
+                obj.di.push(c);
 
-                for(i=0;i<T.docs.length;i++)
-                {
-
-                    if(T.docs[i].display==temp)
-                    {
-                        k.docs.push(T.docs[i]);
-
-
-
-                    }
-                }
             });
 
-
-            if(l != 0)
-                T = k;
-
-
-            k = {};
-            k.docs = [];
-            l = 0;
-
-
-
-
-            $('input[name="type"]:checked').each(function() {
+          /* $('input[name="style"]:checked').each(function() {
                 var temp=this.value;
-                ++l;
+                var d={'style':temp};
+                obj.st.push(d);
 
-                for(i=0;i<T.docs.length;i++)
-                {
-
-                    if(T.docs[i].type==temp)
-                    {
-                        k.docs.push(T.docs[i]);
-
-
-
-                    }
-                }
-
-            });
-
-
-            if(l != 0)
-                T = k;
-
-
-            k = {};
-            k.docs = [];
-            l = 0;
-
-
+            });*/
 
             $('input[name="caseshape"]:checked').each(function() {
                 var temp=this.value;
-                ++l;
-
-                for(i=0;i<T.docs.length;i++)
-                {
-
-                    if(T.docs[i].caseShape==temp)
-                    {
-                        k.docs.push(T.docs[i]);
-
-
-
-                    }
-                }
-
+                var e={'caseShape':temp};
+                obj.ca.push(e);
 
             });
-
-
-            if(l != 0)
-                T = k;
-
-
-            k = {};
-            k.docs = [];
-            l = 0;
-
-
-
 
             $('input[name="strap"]:checked').each(function() {
                 var temp=this.value;
-                ++l;
+                var f={'strap':temp};
+                obj.str.push(f);
 
-                for(i=0;i<T.docs.length;i++)
+            });
+
+            if(obj.br.length == 0)
+                obj.br.push({});
+
+            if(obj.ge.length == 0)
+                obj.ge.push({});
+
+            /*if(obj.st.length == 0)
+                obj.st.push({});*/
+
+            if(obj.str.length == 0)
+                obj.str.push({});
+
+            if(obj.di.length == 0)
+                obj.di.push({});
+
+            if(obj.ca.length == 0)
+                obj.ca.push({});
+
+
+            console.log(obj);
+
+
+            $.post('/filteredData',{obj: JSON.stringify(obj)},function(data,status){
+                //console.log(obj);
+
+                var T=data;
+
+                str='';
+                Results.html("Loading..");
+                Results.css({"display" : "block"});
+
+
+                for(var i = 0 ; i < T.docs.length; ++i)
                 {
+                    str +='<div id= "' + T.docs[i].UniqueId  +   '" class="item ProductDetails "> <img src="img/item.jpg"> <span class="wname">'+T.docs[i].collection+'</span>, <div><span class="wbrand"><b>'+T.docs[i].brand+'</b></span> <span class="wmodel">'+T.docs[i].UniqueId+'</span></div> <div><span class="price">&#8377; '+T.docs[i].price+'</span></div> </div>';
 
-                    if(T.docs[i].strap==temp)
-                    {
-                        k.docs.push(T.docs[i]);
-
-
-                    }
                 }
+                Results.html(str);
+                $(window).scrollTop(0);
+
+
 
             });
 
 
-
-
-            if(l != 0)
-                T = k;
-
-            str='';
-            Results.html("Loading..");
-            Results.css({"display" : "block"});
-
-
-            for(var i = 0 ; i < T.docs.length; ++i)
-            {
-                str +='<div class="item"> <img src="img/item.jpg"> <span class="wname">'+T.docs[i].collection+'</span>, <div><span class="wbrand"><b>'+T.docs[i].brand+'</b></span> <span class="wmodel">'+T.docs[i].UniqueId+'</span></div> <div><span class="price">&#8377; '+T.docs[i].price+'</span></div> </div>';
-
-            }
-            Results.html(str);
-            $(window).scrollTop(0);
-
         });
+
+
+        /*
+         sub.click(function(){
+
+         T = T1;
+
+         var k;
+         k={};
+         k.docs=[];
+         var l = 0;
+         $('input[name="brand"]:checked').each(function() {
+         var temp=this.value;
+         ++l;
+
+         for(i=0;i<T.docs.length;i++)
+         {
+
+         if(T.docs[i].brand==temp)
+         {
+         k.docs.push(T.docs[i]);
+
+
+
+         }
+         }
+
+
+         });
+
+         if(l != 0)
+         T = k;
+
+
+         k = {};
+         k.docs = [];
+         l = 0;
+
+         $('input[name="gender"]:checked').each(function() {
+         var temp=this.value;
+         ++l;
+
+         for(i=0;i<T.docs.length;i++)
+         {
+
+         if(T.docs[i].gender==temp)
+         {
+         k.docs.push(T.docs[i]);
+
+
+
+         }
+         }
+         });
+
+         if(l != 0)
+         T = k;
+
+
+         k = {};
+         k.docs = [];
+         l = 0;
+
+         $('input[name="display"]:checked').each(function() {
+         var temp=this.value;
+         ++l;
+
+         for(i=0;i<T.docs.length;i++)
+         {
+
+         if(T.docs[i].display==temp)
+         {
+         k.docs.push(T.docs[i]);
+
+
+
+         }
+         }
+         });
+
+
+         if(l != 0)
+         T = k;
+
+
+         k = {};
+         k.docs = [];
+         l = 0;
+
+
+
+
+         $('input[name="type"]:checked').each(function() {
+         var temp=this.value;
+         ++l;
+
+         for(i=0;i<T.docs.length;i++)
+         {
+
+         if(T.docs[i].type==temp)
+         {
+         k.docs.push(T.docs[i]);
+
+
+
+         }
+         }
+
+         });
+
+
+         if(l != 0)
+         T = k;
+
+
+         k = {};
+         k.docs = [];
+         l = 0;
+
+
+
+         $('input[name="caseshape"]:checked').each(function() {
+         var temp=this.value;
+         ++l;
+
+         for(i=0;i<T.docs.length;i++)
+         {
+
+         if(T.docs[i].caseShape==temp)
+         {
+         k.docs.push(T.docs[i]);
+
+
+
+         }
+         }
+
+
+         });
+
+
+         if(l != 0)
+         T = k;
+
+
+         k = {};
+         k.docs = [];
+         l = 0;
+
+
+
+
+         $('input[name="strap"]:checked').each(function() {
+         var temp=this.value;
+         ++l;
+
+         for(i=0;i<T.docs.length;i++)
+         {
+
+         if(T.docs[i].strap==temp)
+         {
+         k.docs.push(T.docs[i]);
+
+
+         }
+         }
+
+         });
+
+
+
+
+         if(l != 0)
+         T = k;
+
+         str='';
+         Results.html("Loading..");
+         Results.css({"display" : "block"});
+
+
+         for(var i = 0 ; i < T.docs.length; ++i)
+         {
+         str +='<div class="item"> <img src="img/item.jpg"> <span class="wname">'+T.docs[i].collection+'</span>, <div><span class="wbrand"><b>'+T.docs[i].brand+'</b></span> <span class="wmodel">'+T.docs[i].UniqueId+'</span></div> <div><span class="price">&#8377; '+T.docs[i].price+'</span></div> </div>';
+
+         }
+         Results.html(str);
+         $(window).scrollTop(0);
+
+         });
+
+         */
 
 
 
@@ -443,47 +607,12 @@
         });
 
         $('.ProductDetails').click(function () {
-
-
             console.log("Product function called");
             var id = $(this).attr('id');
             console.log(id);
-
-
         });
 
         var T1;
-
-        $(document).ready(function () {
-
-
-            var str='';
-            Results.html("Loading..");
-            Results.css({"display" : "block"});
-
-            console.log("Hello");
-            count=1;
-
-            $.post('/all-products', {}, function (data, status) {
-
-                console.log(status);
-
-                T=data;
-
-                T1 = T;
-
-
-                for(var i = 0 ; i < data.docs.length; ++i)
-                {
-                    str +='<div class="item"> <img src="img/item.jpg"> <span class="wname">'+data.docs[i].collection+'</span>, <div><span class="wbrand"><b>'+data.docs[i].brand+'</b></span> <span class="wmodel">'+data.docs[i].UniqueId+'</span></div> <div><span class="price">&#8377; '+data.docs[i].price+'</span></div> </div>';
-
-                }
-                Results.html(str);
-            });
-
-
-        });
-
 
     }
 
@@ -502,6 +631,7 @@
     main();
 
 </script>
+<script src="helper_files/index.js"></script>
 
 
 </body>
