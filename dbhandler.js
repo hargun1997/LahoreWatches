@@ -324,10 +324,69 @@ function AllProducts(callback)
 
 
 
+function filteredData(obj,callback)
+{
+    console.log("Hello filter");
+
+
+
+    var o={
+        $and:[{
+            $or:obj.br
+        },
+
+            {
+                $or:obj.ge
+            },
+
+            {
+                $or:obj.di
+            },
+
+            {
+                $or:obj.st
+            },
+
+            {
+                $or:obj.ca
+            },
+
+            {
+                $or:obj.str
+            }]
+
+    }
+
+
+    console.log("Getting O");
+    console.log(o);
+    mongoClient.connect(url, function (err, db)
+    {
+        if(err)
+            throw err;
+
+        var handler = db.collection('watch-details');
+        handler.find(o).toArray(function (err, docs) {
+
+            console.log(1);
+            console.log("getting docs");
+            console.log(docs);
+            callback(docs);
+
+        });
+
+    });
+
+
+}
+
+
+
 module.exports  = {
     new_user:new_user,
     add_watch_details:add_watch_details,
     GetFromID : GetFromID,
     GetCart : GetCartItems,
-    AllProducts : AllProducts
+    AllProducts : AllProducts,
+    filteredData:filteredData
 };
