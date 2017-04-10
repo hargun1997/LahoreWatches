@@ -16,32 +16,12 @@
     <span class="brand"><img src="img/lwh.png" style="margin-right:10px;"><span><span><span class="dynamic" style="position:absolute;top:0px;"></span><span style="opacity:0;">Lahore Watch House</span></span></span></span>
     <div class="blackout"><img src="img/cross.png" style="margin-left:30px;"></div>
     <ul class="links">
-        <a><li>Brands<ul class="dropdown">
-            <a href="#"><li>About Us</li></a>
-            <a href="#"><li>Locations</li></a>
-            <a href="#"><li>Contact & Repair</li></a>
-            <a href="#"><li>About Us</li></a>
-            <a href="#"><li>Locations</li></a>
-            <a href="#"><li>Contact & Repair</li></a>
-            <a href="#"><li>About Us</li></a>
-            <a href="#"><li>Locations</li></a>
-            <a href="#"><li>Contact & Repair</li></a>
-            <a href="#"><li>About Us</li></a>
-            <a href="#"><li>Locations</li></a>
-            <a href="#"><li>Contact & Repair</li></a>
-            <a href="#"><li>About Us</li></a>
-            <a href="#"><li>Locations</li></a>
-            <a href="#"><li>Contact & Repair</li></a>
-            <a href="#"><li>About Us</li></a>
-            <a href="#"><li>Locations</li></a>
-            <a href="#"><li>Contact & Repair</li></a>
-            <a href="#"><li>About Us</li></a>
-            <a href="#"><li>Locations</li></a>
-            <a href="#"><li>Contact & Repair</li></a>
-            <a href="#"><li>About Us</li></a>
-            <a href="#"><li>Locations</li></a>
-            <a href="#"><li>Contact & Repair</li></a>
-        </ul></li></a>
+
+        <a><li >Brands
+            <ul id="ShowBrands" class="dropdown" >
+            </ul>
+        </li></a>
+
         <a href="#"><li>About Us</li></a>
         <a href="#"><li>Locations</li></a>
         <a href="#"><li>Contact & Repair</li></a>
@@ -102,9 +82,9 @@
     <div id="sort" >
         PRICE-
         <br>
-        <input type="checkbox" value="Low" name="price">LOW-HIGH
+        <input type="checkbox" id="low" value=-1 name="price" onclick="func1(-1)">LOW-HIGH
         <br>
-        <input type="checkbox" value="High" name="price">HIGH-LOW
+        <input type="checkbox" id="high" value=1 name="price" onclick="func1(1)">HIGH-LOW
         <br>
     </div>
     <br>
@@ -182,6 +162,8 @@
     console.log(sub);
     var T={};
     var LoginSpan = $('#LoginSpan');
+    var ShowBrands=$('#ShowBrands');
+    var D={};
 
     function RefreshState()
     {
@@ -202,6 +184,47 @@
         }
 
     }
+    var c=0;
+
+    function func1(temp){
+
+        if(c%2==0) {
+            if (temp == -1) {
+                $('#high').attr('disabled', true);
+            }
+            else {
+                $('#low').attr('disabled', true);
+
+            }
+        }
+        else
+        {
+            $('#high').attr('disabled', false);
+            $('#low').attr('disabled', false);
+            $('#high').attr('checked', false);
+            $('#low').attr('checked', false);
+
+
+        }
+        c++;
+
+    };
+
+
+    function func(temp){
+
+        $('input:checkbox').removeAttr('checked');
+        $('input[name="brand"]').each(function() {
+
+            if(D.docs[temp]==this.value){
+                $(this).attr('checked',true);
+            }
+        });
+        sub.click();
+
+
+    };
+
     function main()
     {
         var sub=$('#sub');
@@ -270,6 +293,31 @@
         console.log("Hello");
         count=1;
 
+
+
+        $.post('/distinct-brands',{},function(data,status){
+
+            console.log(status);
+            console.log('distinct brands');
+            console.log(data);
+
+            D=data;
+            str1='';
+
+            for(var i = 0 ; i < data.docs.length; ++i)
+            {
+
+                str1+='<a><li onclick="func('+i+')" value='+data.docs[i]+'>'+data.docs[i]+'</li></a>';
+            }
+
+
+            ShowBrands.html(str1);
+
+
+        });
+
+
+
         $.post('/all-products', {}, function (data, status) {
 
             console.log(status);
@@ -284,9 +332,15 @@
         });
 
 
+
+
         sub.click(function(){
 
-            console.log("Sub Function called");
+
+
+            $(window).scrollTop(0);
+            Results.html("Loading..");
+            Results.css({"display" : "block"})
 
             var obj={};
             obj.br=[];
@@ -295,6 +349,9 @@
             obj.ca=[];
            // obj.st=[];
             obj.str=[];
+            obj.so={
+                'price':-1
+            };
           /*  UniqueId : id,
                 type : type,
                 brand : brand,
@@ -346,6 +403,19 @@
 
             });
 
+
+            $('input[name="price"]:checked').each(function() {
+                var temp=this.value;
+                if(temp==-1) {
+                    obj.so.price=1;
+                }
+                else{
+
+                    obj.so.price=-1;
+
+                }
+            });
+
             if(obj.br.length == 0)
                 obj.br.push({});
 
@@ -364,12 +434,13 @@
             if(obj.ca.length == 0)
                 obj.ca.push({});
 
+            if(obj.so.length == 0)
+                obj.so.push({});
 
-            console.log(obj);
+
 
 
             $.post('/filteredData',{obj: JSON.stringify(obj)},function(data,status){
-                //console.log(obj);
 
                 var T=data;
 
@@ -383,8 +454,16 @@
                     str +='<div id= "' + T.docs[i].UniqueId  +   '" class="item ProductDetails "> <img src="img/item.jpg"> <span class="wname">'+T.docs[i].collection+'</span>, <div><span class="wbrand"><b>'+T.docs[i].brand+'</b></span> <span class="wmodel">'+T.docs[i].UniqueId+'</span></div> <div><span class="price">&#8377; '+T.docs[i].price+'</span></div> </div>';
 
                 }
-                Results.html(str);
+
+                if(username == null || username == undefined || typeof username == 'undefined')
+                {
+                    str+='<div>'+ 'No Result Matched Your Requirements' +'</div>';
+                }
+                else {
+                    Results.html(str);
+                }
                 $(window).scrollTop(0);
+
 
 
 
@@ -394,195 +473,7 @@
         });
 
 
-        /*
-         sub.click(function(){
 
-         T = T1;
-
-         var k;
-         k={};
-         k.docs=[];
-         var l = 0;
-         $('input[name="brand"]:checked').each(function() {
-         var temp=this.value;
-         ++l;
-
-         for(i=0;i<T.docs.length;i++)
-         {
-
-         if(T.docs[i].brand==temp)
-         {
-         k.docs.push(T.docs[i]);
-
-
-
-         }
-         }
-
-
-         });
-
-         if(l != 0)
-         T = k;
-
-
-         k = {};
-         k.docs = [];
-         l = 0;
-
-         $('input[name="gender"]:checked').each(function() {
-         var temp=this.value;
-         ++l;
-
-         for(i=0;i<T.docs.length;i++)
-         {
-
-         if(T.docs[i].gender==temp)
-         {
-         k.docs.push(T.docs[i]);
-
-
-
-         }
-         }
-         });
-
-         if(l != 0)
-         T = k;
-
-
-         k = {};
-         k.docs = [];
-         l = 0;
-
-         $('input[name="display"]:checked').each(function() {
-         var temp=this.value;
-         ++l;
-
-         for(i=0;i<T.docs.length;i++)
-         {
-
-         if(T.docs[i].display==temp)
-         {
-         k.docs.push(T.docs[i]);
-
-
-
-         }
-         }
-         });
-
-
-         if(l != 0)
-         T = k;
-
-
-         k = {};
-         k.docs = [];
-         l = 0;
-
-
-
-
-         $('input[name="type"]:checked').each(function() {
-         var temp=this.value;
-         ++l;
-
-         for(i=0;i<T.docs.length;i++)
-         {
-
-         if(T.docs[i].type==temp)
-         {
-         k.docs.push(T.docs[i]);
-
-
-
-         }
-         }
-
-         });
-
-
-         if(l != 0)
-         T = k;
-
-
-         k = {};
-         k.docs = [];
-         l = 0;
-
-
-
-         $('input[name="caseshape"]:checked').each(function() {
-         var temp=this.value;
-         ++l;
-
-         for(i=0;i<T.docs.length;i++)
-         {
-
-         if(T.docs[i].caseShape==temp)
-         {
-         k.docs.push(T.docs[i]);
-
-
-
-         }
-         }
-
-
-         });
-
-
-         if(l != 0)
-         T = k;
-
-
-         k = {};
-         k.docs = [];
-         l = 0;
-
-
-
-
-         $('input[name="strap"]:checked').each(function() {
-         var temp=this.value;
-         ++l;
-
-         for(i=0;i<T.docs.length;i++)
-         {
-
-         if(T.docs[i].strap==temp)
-         {
-         k.docs.push(T.docs[i]);
-
-
-         }
-         }
-
-         });
-
-
-
-
-         if(l != 0)
-         T = k;
-
-         str='';
-         Results.html("Loading..");
-         Results.css({"display" : "block"});
-
-
-         for(var i = 0 ; i < T.docs.length; ++i)
-         {
-         str +='<div class="item"> <img src="img/item.jpg"> <span class="wname">'+T.docs[i].collection+'</span>, <div><span class="wbrand"><b>'+T.docs[i].brand+'</b></span> <span class="wmodel">'+T.docs[i].UniqueId+'</span></div> <div><span class="price">&#8377; '+T.docs[i].price+'</span></div> </div>';
-
-         }
-         Results.html(str);
-         $(window).scrollTop(0);
-
-         });
-
-         */
 
 
 

@@ -79,6 +79,17 @@ app.post('/all-products', function (req, res) {
 
 });
 
+app.post('/distinct-brands', function (req, res) {
+
+    db.DistinctBrands(function (docs) {
+
+        res.send({docs : docs});
+
+    });
+
+});
+
+
 app.listen(port, function () {
 
     console.log("Server started on port " + port);

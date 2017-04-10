@@ -304,7 +304,7 @@ function GetCartItems(cart, callback) {
 
 function AllProducts(callback)
 {
-    console.log("Hrllo");
+    console.log("Hello");
     mongoClient.connect(url, function (err, db)
     {
         if(err)
@@ -319,6 +319,25 @@ function AllProducts(callback)
     });
 
 
+}
+
+function DistinctBrands(callback)
+{
+    mongoClient.connect(url, function (err, db)
+    {
+        if(err)
+            throw err;
+        var handler = db.collection('watch-details');
+        temp=handler.distinct("brand") ;
+
+        temp.then(function(docs){
+            callback(docs);
+
+        });
+
+        
+
+    });
 }
 
 
@@ -362,9 +381,9 @@ function filteredData(obj,callback)
             throw err;
 
         var handler = db.collection('watch-details');
-        handler.find(o).toArray(function (err, docs) {
+        handler.find(o).sort(obj.so).toArray(function (err, docs) {
 
-            console.log(1);
+            console.log(obj.so);
             console.log("getting docs");
             console.log(docs);
             callback(docs);
@@ -384,5 +403,6 @@ module.exports  = {
     GetFromID : GetFromID,
     GetCart : GetCartItems,
     AllProducts : AllProducts,
-    filteredData:filteredData
+    filteredData:filteredData,
+    DistinctBrands:DistinctBrands
 };
