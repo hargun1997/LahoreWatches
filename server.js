@@ -52,6 +52,23 @@ app.post('/getcart', function (req, res) {
 });
 
 
+app.post('/filteredData', function (req, res) {
+
+    console.log(req.body.obj);
+    var o = JSON.parse(req.body.obj);
+
+    console.log(o);
+
+    db.filteredData(o,function (docs) {
+
+        res.send({docs : docs});
+
+    });
+
+});
+
+
+
 app.post('/all-products', function (req, res) {
 
     db.AllProducts(function (docs) {
