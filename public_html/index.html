@@ -184,12 +184,12 @@
         }
 
     }
-    var c=0;
+    var c1=0;
 
-    function func1(temp){
+    function func1(temp1){
 
-        if(c%2==0) {
-            if (temp == -1) {
+        if(c1%2==0) {
+            if (temp1 == -1) {
                 $('#high').attr('disabled', true);
             }
             else {
@@ -206,17 +206,17 @@
 
 
         }
-        c++;
+        c1++;
 
     };
 
 
-    function func(temp){
+    function func(temp2){
 
         $('input:checkbox').removeAttr('checked');
         $('input[name="brand"]').each(function() {
 
-            if(D.docs[temp]==this.value){
+            if(D.docs[temp2]==this.value){
                 $(this).attr('checked',true);
             }
         });
@@ -455,7 +455,7 @@
 
                 }
 
-                if(username == null || username == undefined || typeof username == 'undefined')
+                if(str == null || str == undefined || typeof str == 'undefined')
                 {
                     str+='<div>'+ 'No Result Matched Your Requirements' +'</div>';
                 }
