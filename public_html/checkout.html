@@ -73,11 +73,8 @@
 
 
             });
-
             function logged(user) {
-
                 console.log(user);
-
                 $.post('/new-user',user.providerData[0],function (data,status) {
 
                     console.log("Hello");
@@ -163,13 +160,14 @@
                     address : address,
                     phone : phone
                 };
-
+                $('#one').css({'display' : 'none'});
+                msg.html("Loading..");
                 $.post('/PostOrder', obj, function (data, status) {
 
                     console.log(status);
                     alert("Order Confirmed");
                     console.log(data);
-                    $('#one').css({'display' : 'none'});
+
                     localStorage.removeItem('cart');
                     msg.html("Order Confirmed. Your order id is " + data.result );
                     $('#home').css({'display' : 'block'});

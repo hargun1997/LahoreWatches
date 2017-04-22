@@ -410,6 +410,8 @@ function InsertOrder(order, callback)
 
             var id = docs.length + 2;
 
+            order.status = 'Queued';
+            order.id = id;
             handler.insertOne(order, function (err, r) {
 
                 if(err)
@@ -427,7 +429,59 @@ function InsertOrder(order, callback)
 
 }
 
+function GetOrders(callback) {
+    mongoClient.connect(url, function (err, db)
+    {
+        if(err)
+            throw err;
 
+        var handler = db.collection('orders');
+        handler.find({}).toArray(function (err, docs) {
+
+            if(err)
+                throw err;
+
+
+            callback(docs);
+
+        });
+
+    });
+
+
+}
+
+// Tested Function to update status
+
+function UpdateStatus(id, status, callback) {
+
+    mongoClient.connect(url, function (err, db)
+    {
+        if(err)
+            throw err;
+
+        var handler = db.collection('orders');
+        handler.updateOne({id : id}, {$set : {status : status}}, function (err, r) {
+
+            if(err)
+                throw err;
+
+            console.log(r);
+            callback(1);
+
+        })
+
+    });
+
+
+}
+
+/*
+UpdateStatus(2, 'Done', function (result) {
+   console.log("Result is");
+   console.log(result);
+
+});*/
 
 module.exports  = {
     new_user:new_user,
@@ -437,5 +491,7 @@ module.exports  = {
     AllProducts : AllProducts,
     filteredData:filteredData,
     DistinctBrands:DistinctBrands,
-    InsertOrder : InsertOrder
+    InsertOrder : InsertOrder,
+    GetOrders : GetOrders,
+    UpdateStatus : UpdateStatus
 };

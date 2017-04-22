@@ -10,6 +10,25 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/', express.static(__dirname + '/public_html'));
 
+var fs = require('fs');
+var multer = require('multer');
+var upload = multer({ dest: 'uploads'});
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended : true}));
+app.use('/', express.static('public_html'));
+app.post('/upload', upload.single('file'), function(req, res) {
+    console.log(req.file);
+    var file = __dirname + '/uploads/' + 'image.png';
+    fs.rename(req.file.path, file, function(err) {
+        if (err) {
+            console.log(err);
+            res.send(500);
+        } else {
+            res.redirect('/');
+        }
+    });
+});
+
 app.post('/new-user',function (req,res) {
     db.new_user(req.body,function (result) {
         res.end();
@@ -102,8 +121,50 @@ app.post('/PostOrder', function (req, res) {
 
 });
 
+app.post('/getOrders', function(req,res){
+
+    db.GetOrders(function (docs) {
+        console.log(docs);
+        res.send({docs : docs});
+
+    });
+
+});
+
+/*
+* This function takes in request object the order id and the new status
+*
+* */
+app.post('/updateStatus', function (req, res) {
+
+    db.UpdateStatus(req.body.id, req.body.status, function (result) {
+
+        res.send({result : result});
+
+    });
+
+});
+
+app.post('/upload', upload.single('file'), function(req, res) {
+    console.log(req.file);
+    var file = __dirname + '/uploads/' + 'image.png';
+    fs.rename(req.file.path, file, function(err) {
+        if (err) {
+            console.log(err);
+            res.send(500);
+        } else {
+            res.redirect('/');
+        }
+    });
+});
+
+
+
+
+
 
 app.listen(port, function () {
 
     console.log("Server started on port " + port);
+
 });

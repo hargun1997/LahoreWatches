@@ -6,7 +6,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="js/jquery.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <style>
@@ -24,21 +24,13 @@
 
 <div class="container">
     <h2>Upload a product</h2>
-    <form>
-
-
+    <form enctype="multipart/form-data">
         <div class="form-group">
-            <label for="Pimg">Product Images-</label>
+            <label for="image">Product Images-</label>
             <br>
-            <span>1.</span> <input type="file" class="form-control" id="Pimg" placeholder="Enter Link" >
-            <span>2.</span> <input type="file" class="form-control" id="Pimg1" placeholder="Enter Link">
-            <span>3.</span> <input type="file" class="form-control" id="Pimg2" placeholder="Enter Link">
-            <span>4.</span> <input type="file" class="form-control" id="Pimg3" placeholder="Enter Link">
-            <span>5.</span> <input type="file" class="form-control" id="Pimg4" placeholder="Enter Link">
-
+            <span>1.</span>
+            <input type="file" class="form-control" id="image" >
         </div>
-
-
         <div class="form-group">
             <label for="Pname">Product Name-</label>
             <input type="text" class="form-control" id="Pname" placeholder="Enter Product Name" required>
@@ -92,25 +84,93 @@
         <button type="submit" class="btn btn-default" id="submit">Submit</button>
     </form>
 </div>
+<progress>
 
+
+
+</progress>
+
+<br><br>
+
+<div id="orders">
+
+
+
+
+</div>
 
 </body>
-<script src="js/jquery.js"></script>
 <script>
+
+    var orders = $('#orders');
+    orders.html("Loading. ");
+    $.post('/getOrders', {}, function (data, status) {
+
+        console.log(status);
+        console.log(data);
+        data = data.docs;
+
+
+
+        var str = '';
+
+        for(var i = 0 ; i < data.length; ++i)
+        {
+            str += '<p> Order Id : ' + data[i].id + ' <br>';
+            str += 'Username : ' + data[i].username + '<br>';
+            str += 'Bill : ' + data[i].bill + '<br>';
+            str += 'Address : ' + data[i].address + '<br>';
+            str += 'Status : ' + data[i].status + '<br>';
+            str += 'Phone : ' + data[i].phone + '<br>';
+            str += '<br> CART <br>';
+            var cart = data[i].cart;
+           // cart = JSON.parse(cart);
+            for(var j = 0 ; j < cart.length; ++j)
+            {
+                str += '   ' + cart[j] + '  ' + '  ';
+            }
+            str += '</p>'
+
+        }
+
+        orders.html(str);
+
+
+    });
+
     $("#submit").click(function () {
         // enter the values in the blanks('')
-        var obj = {};
-            obj.watch_id=$("#ID").value;
-            obj.type=$("#Ptype").value;
-            obj.brand=$("#Pbrand").value;
-            obj.gender=$("#Pgender").value;
-            obj.price=$("#Pprice").value;
-            obj.case_shape=$("#Pcaseshape").value;
-            obj.strap=$("#Pstrap").value;
-            obj.collection=$("#Pcollection").value;
-            obj.display=$("#Pdisplay").value;
-            $.post('/add_watch_details',obj,function (data,status) {
-            });
+        $.ajax({
+            // Your server script to process the upload
+            url: '/upload',
+            type: 'POST',
+
+            // Form data
+            data: new FormData($('form')[0]),
+
+            // Tell jQuery not to process data or worry about content-type
+            // You *must* include these options!
+            cache: false,
+            contentType: false,
+            processData: false,
+
+            // Custom XMLHttpRequest
+            xhr: function() {
+                var myXhr = $.ajaxSettings.xhr();
+                if (myXhr.upload) {
+                    // For handling the progress of the upload
+                    myXhr.upload.addEventListener('progress', function(e) {
+                        if (e.lengthComputable) {
+                            $('progress').attr({
+                                value: e.loaded,
+                                max: e.total
+                            });
+                        }
+                    } , false);
+                }
+                return myXhr;
+            }
+        });
     })
 </script>
 </html>
