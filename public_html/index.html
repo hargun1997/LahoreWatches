@@ -208,9 +208,7 @@
         }
         c1++;
 
-    };
-
-
+    }
     function func(temp2){
 
         $('input:checkbox').removeAttr('checked');
@@ -223,8 +221,7 @@
         sub.click();
 
 
-    };
-
+    }
     function main()
     {
         var sub=$('#sub');
@@ -455,31 +452,16 @@
 
                 }
 
-                if(str == null || str == undefined || typeof str == 'undefined')
+                if(str == null || str == undefined || typeof str == 'undefined' || str == '')
                 {
                     str+='<div>'+ 'No Result Matched Your Requirements' +'</div>';
                 }
-                else {
-                    Results.html(str);
-                }
+                Results.html(str);
                 $(window).scrollTop(0);
-
-
-
-
             });
 
-
         });
-
-
-
-
-
-
-
         $(Results).on('click', '.ProductDetails', function () {
-
 
             console.log("Product function called");
             var id = $(this).attr('id');

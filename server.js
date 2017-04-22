@@ -89,6 +89,19 @@ app.post('/distinct-brands', function (req, res) {
 
 });
 
+app.post('/PostOrder', function (req, res) {
+
+    db.InsertOrder(req.body, function (result) {
+
+        console.log("Result is");
+        console.log(result);
+        res.send({result : result});
+
+    });
+
+
+});
+
 
 app.listen(port, function () {
 

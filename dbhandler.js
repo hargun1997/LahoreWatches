@@ -395,6 +395,38 @@ function filteredData(obj,callback)
 
 }
 
+function InsertOrder(order, callback)
+{
+    mongoClient.connect(url, function (err, db)
+    {
+        if(err)
+            throw err;
+
+        var handler = db.collection('orders');
+        handler.find({}).toArray(function (err, docs) {
+
+            if(err)
+                throw err;
+
+            var id = docs.length + 2;
+
+            handler.insertOne(order, function (err, r) {
+
+                if(err)
+                    throw err;
+
+                console.log(r);
+                console.log("Inserted");
+                callback(id);
+
+            });
+
+        });
+
+    });
+
+}
+
 
 
 module.exports  = {
@@ -404,5 +436,6 @@ module.exports  = {
     GetCart : GetCartItems,
     AllProducts : AllProducts,
     filteredData:filteredData,
-    DistinctBrands:DistinctBrands
+    DistinctBrands:DistinctBrands,
+    InsertOrder : InsertOrder
 };

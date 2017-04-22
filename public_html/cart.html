@@ -11,12 +11,15 @@
 
 
     </div>
+    <br><br>
+    <div id="checkout" style="display: none">
 
+        <button id="buttonCheckout">Proceed to checkout</button>
 
+    </div>
     <script>
 
         $(function () {
-
 
             var cart = localStorage.getItem('cart');
             if(cart == null || typeof cart == 'undefined' || cart == undefined)
@@ -76,20 +79,23 @@
                     localStorage.setItem('cart', cart);
                     window.location = "";
                 });
-
-
-
-                if(str == '')
+                if(str == '' || str == null || typeof str == 'undefined')
                 {
                     str = 'No items in the cart';
                 }
-
+                else
+                {
+                    $('#checkout').css({'display' : 'block'});
+                }
                 Details.html(str);
 
-            })
+            });
 
+            $('#checkout').click(function () {
 
+                window.location.href = "checkout.html";
 
+            });
         });
 
 

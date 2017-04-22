@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout</title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase.js"></script>
+    <script src="helper_files/firebase.js"></script>
+</head>
+<body>
+
+    <div id="msg">
+
+
+    </div>
+    <div id="one" style="display: none">
+        <div id="Details">
+
+
+        </div>
+        <div id="address">
+
+            <input id="AddressInput" type="text" placeholder="Address">
+            <input type="number" placeholder="number" id="number">
+
+        </div>
+        <div id="confirm" >
+
+            <button id="confirmButton">Confirm Order</button>
+
+        </div>
+    </div>
+
+
+
+    <div id="google" style="display:none;">
+
+        <button id="googleButton">Login</button>
+
+    </div>
+
+    <a href="index.html" style="display: none" id="home"> <button>Home</button> </a>
+
+    <script>
+        var P = 0;
+
+        var username = localStorage.getItem('username');
+        var cart = localStorage.getItem('cart');
+        console.log(username);
+        console.log(cart);
+        var msg = $('#msg');
+        var google = $('#google');
+
+
+        if(username == null || typeof username == 'undefined' || username == undefined)
+        {
+            msg.html("Please login to continue");
+            google.css({'display' : 'block'});
+
+
+            $('#googleButton').click(function () {
+
+                var provider = new firebase.auth.GoogleAuthProvider();
+                firebase.auth().signInWithPopup(provider).then(function(result) {
+                    var user = result.user;
+                    logged(user);
+
+                }).catch(function(error) {
+                    alert(error.message);
+                    location.reload();
+                });
+
+
+            });
+
+            function logged(user) {
+
+                console.log(user);
+
+                $.post('/new-user',user.providerData[0],function (data,status) {
+
+                    console.log("Hello");
+                    localStorage.setItem('username',user.providerData[0].email);
+                    localStorage.setItem('state','true');
+                    console.log(user.providerData[0].email);
+                    console.log("Hello. New user");
+                    console.log(user.providerData[0].email);
+                    //  window.location.href='index.html';
+                    //   window.location.reload();
+                    location.reload();
+                });
+            }
+        }
+        else if(cart =='' || cart == null || typeof cart == 'undefined')
+        {
+
+
+            msg.html("No items in your cart. Can't Checkout.");
+        }
+        else
+        {
+
+            $('#one').css({'display' : 'block'});
+            cart = JSON.parse(cart);
+            var Details = $('#Details');
+            if(cart.length == 0)
+            {
+                alert("Empty Cart. Moving to home page");
+                window.location.href = "index.html";
+            }
+            Details.html("Loading Your Cart....");
+            $.post('/getcart',{cart : cart},  function (data, status) {
+
+                console.log(status);
+                console.log(data.docs);
+
+                var str = '';
+
+
+
+                for(var i = 0 ; i < data.docs.length; ++i)
+                {
+                    str += '<p id="' + data.docs[i].UniqueId + 'P" class="ProductDetails">';
+                    /*id : id,
+                     type : type,
+                     brand : brand,
+                     gender : gender,
+                     price : price,
+                     caseShape : caseShape,
+                     strap : strap,
+                     collection : collection,
+                     display : display*/
+
+                    str += ('type : ' + data.docs[i].type + ' ||  ' );
+                    str += ('brand : ' + data.docs[i].brand + ' ||  ' );
+                    str += ('gender : ' + data.docs[i].gender + ' ||  ' );
+                    str += ('price : ' + data.docs[i].price + ' ||  ' );
+                    P += Number(data.docs[i].price);
+                    str += ('caseShape : ' + data.docs[i].caseShape + ' ||  ' );
+                    str += ('strap : ' + data.docs[i].strap + ' ||  ' );
+                    str += ('collection : ' + data.docs[i].collection + ' ||  ' );
+                    str += ('display : ' + data.docs[i].display );
+                    str += '<br>';
+                    str += '</p>';
+                }
+
+                str += '<br> Total Bill Amount : ' + P + '';
+
+                Details.html(str);
+            });
+
+
+            $('#confirmButton').click(function () {
+
+                var address = $('#addressinput').val();
+                var phone = $('#number').val();
+                var obj = {
+
+                    username : username,
+                    cart : cart,
+                    bill : P,
+                    address : address,
+                    phone : phone
+                };
+
+                $.post('/PostOrder', obj, function (data, status) {
+
+                    console.log(status);
+                    alert("Order Confirmed");
+                    console.log(data);
+                    $('#one').css({'display' : 'none'});
+                    localStorage.removeItem('cart');
+                    msg.html("Order Confirmed. Your order id is " + data.result );
+                    $('#home').css({'display' : 'block'});
+                    //window.location.href = "order.html";
+
+                });
+
+            });
+
+        }
+    </script>
+</body>
+</html>
