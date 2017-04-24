@@ -179,13 +179,27 @@ app.post('/upload', upload.single('file'), function(req, res) {
 * */
 
 /*
-* Send an object in post request of the form { email : "email" } and the function will return you all the details of the user if it exists; Otherwise it returns an empty array in user field. Phone number and address fields may be empty.
+* Send an object in post request of the form { email : "email" } and the function will return you all the details of the user if it exists; Otherwise it returns an empty array in user field. Phone number and address fields may be empty. You will also all the orders booked by the user. The result object is like the following
+* {
+*
+* user : {
+*'uid':
+ 'name':
+ 'email' :
+ 'photo' :
+ 'phone_number'
+ 'address':
+ orders : [ An array of details of all orders ]
+*
+* }
+ }
 * */
 app.post('/get-user', function (req, res) {
 
 
     db.GetUser(req.body.email, function (result) {
        console.log(req.body);
+       console.log("User is ");
        console.log(result);
         res.send({user : result});
 
@@ -210,11 +224,13 @@ app.post('/get-user', function (req, res) {
  'address':''
 *
 * */
+// Tested
 app.post('/update-user', function (req, res) {
 
     console.log(req.body);
     db.UpdateUser(req.body.email, req.body.update, function (result) {
 
+        console.log(result);
         res.send({result : result});
 
     });

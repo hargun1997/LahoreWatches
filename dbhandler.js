@@ -483,6 +483,7 @@ UpdateStatus(2, 'Done', function (result) {
 
 function  GetUser(email ,callback)
 {
+    var result = {};
     mongoClient.connect(url, function (err, db)
     {
         if(err)
@@ -493,9 +494,21 @@ function  GetUser(email ,callback)
 
             if(err)
                 throw err;
+            console.log("First Request");
+            console.log(docs);
+            if(docs.length)
+                result.user = docs[0];
+            else
+                result.user = docs;
+            var handler1 = db.collection('orders');
+            handler1.find({email : email}).toArray(function (err, docs) {
 
-            callback(docs);
+                if(err)
+                    throw err;
 
+                result.user.orders = docs;
+                callback(result);
+            });
         });
     });
 
