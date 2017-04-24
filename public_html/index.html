@@ -165,6 +165,7 @@
     var ShowBrands=$('#ShowBrands');
     var D={};
 
+
     function RefreshState()
     {
         username = localStorage.getItem('username');
@@ -209,6 +210,20 @@
         c1++;
 
     }
+    /*firebase.auth().signOut().then(function() {
+        localStorage.removeItem('username');
+        localStorage.removeItem('state');
+        //  location.reload();
+
+
+        RefreshState();
+    }, function(error) {
+        console.log(error.code);
+        console.log(error.message);
+        RefreshState();
+        //location.reload();
+    });*/
+
     function func(temp2){
 
         $('input:checkbox').removeAttr('checked');
@@ -337,7 +352,7 @@
 
             $(window).scrollTop(0);
             Results.html("Loading..");
-            Results.css({"display" : "block"})
+            Results.css({"display" : "block"});
 
             var obj={};
             obj.br=[];

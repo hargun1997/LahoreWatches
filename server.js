@@ -30,6 +30,8 @@ app.post('/upload', upload.single('file'), function(req, res) {
 });
 
 app.post('/new-user',function (req,res) {
+    console.log("User Code");
+    console.log(req.body);
     db.new_user(req.body,function (result) {
         res.end();
     });
@@ -133,7 +135,11 @@ app.post('/getOrders', function(req,res){
 
 /*
 * This function takes in request object the order id and the new status
-*
+*{
+* id : id
+* status : newStatus
+* }
+* Will update the status of the order. Make sure the order id is correct.
 * */
 app.post('/updateStatus', function (req, res) {
 
@@ -159,7 +165,60 @@ app.post('/upload', upload.single('file'), function(req, res) {
 });
 
 
+/*
+* User Functions.
+* Schema:
+* The user scheme is as follows:
+ * 'uid':
+ 'name':
+ 'email' :
+ 'photo' :
+ 'phone_number'
+ 'address':
+ *
+* */
 
+/*
+* Send an object in post request of the form { email : "email" } and the function will return you all the details of the user if it exists; Otherwise it returns an empty array in user field. Phone number and address fields may be empty.
+* */
+app.post('/get-user', function (req, res) {
+
+
+    db.GetUser(req.body.email, function (result) {
+       console.log(req.body);
+       console.log(result);
+        res.send({user : result});
+
+    });
+
+});
+
+
+/*
+* This function takes an object of the form { email : email, update : {}  }
+* The update field will contain the updated items. For example if the address and phone is updated by the user, then this function will receive update object as
+* update : { address : newAddress , phone_number : newPhoneNumber   }
+*
+*
+*
+* The user scheme is as follows:
+* 'uid':obj.uid,
+ 'name':obj.displayName,
+ 'email' : obj.email,
+ 'photo' : obj.photoURL,
+ 'phone_number':'',
+ 'address':''
+*
+* */
+app.post('/update-user', function (req, res) {
+
+    console.log(req.body);
+    db.UpdateUser(req.body.email, req.body.update, function (result) {
+
+        res.send({result : result});
+
+    });
+});
 
 
 

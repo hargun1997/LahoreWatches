@@ -1,6 +1,7 @@
 function logged(user) {
 
-    console.log(user);
+
+
 
     $.post('/new-user',user.providerData[0],function (data,status) {
 

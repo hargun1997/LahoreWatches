@@ -7,7 +7,7 @@ function new_user(obj,callback)
     mongoClient.connect(url, function (err, db)
     {
         assert.equal(err,null);
-        var handler = db.collection('user-detail');
+        var handler = db.collection('users');
         handler.find({'uid':obj.uid}).toArray(function (err,result) {
             assert.equal(err,null);
             if(result.length)
@@ -23,6 +23,7 @@ function new_user(obj,callback)
                         'uid':obj.uid,
                         'name':obj.displayName,
                         'email' : obj.email,
+                        'photo' : obj.photoURL,
                         'phone_number':'',
                         'address':''
                     },function (err,result) {
@@ -30,9 +31,6 @@ function new_user(obj,callback)
                         db.close();
                         callback(1);
                     }
-
-
-
                 );
             }
         });
@@ -483,6 +481,51 @@ UpdateStatus(2, 'Done', function (result) {
 
 });*/
 
+function  GetUser(email ,callback)
+{
+    mongoClient.connect(url, function (err, db)
+    {
+        if(err)
+            throw err;
+
+        var handler = db.collection('users');
+        handler.find({email : email}).toArray(function (err ,docs) {
+
+            if(err)
+                throw err;
+
+            callback(docs);
+
+        });
+    });
+
+
+}
+
+function UpdateUser(email ,update, callback) {
+
+    mongoClient.connect(url, function (err, db)
+    {
+        if(err)
+            throw err;
+
+        var handler = db.collection('users');
+        handler.updateOne({email : email}, {$set : update}, function (err, r) {
+
+            if(err)
+                throw err;
+
+            console.log(r);
+            callback(1);
+
+        })
+
+    });
+
+
+}
+
+
 module.exports  = {
     new_user:new_user,
     add_watch_details:add_watch_details,
@@ -493,5 +536,7 @@ module.exports  = {
     DistinctBrands:DistinctBrands,
     InsertOrder : InsertOrder,
     GetOrders : GetOrders,
-    UpdateStatus : UpdateStatus
+    UpdateStatus : UpdateStatus,
+    GetUser : GetUser,
+    UpdateUser : UpdateUser
 };
